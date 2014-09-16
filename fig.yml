@@ -1,0 +1,6 @@
+web:
+  build: web
+  volumes:
+    - .:/go/src/github.com/marksteve/kwentomosapagong
+  ports:
+    - 8000:8000

@@ -1,0 +1,10 @@
+{
+	"ImportPath": "github.com/marksteve/kwentomosapagong/web",
+	"GoVersion": "go1.3",
+	"Deps": [
+		{
+			"ImportPath": "github.com/zenazn/goji",
+			"Rev": "90d355d3e1693435a6300da7d4e191126aced78e"
+		}
+	]
+}
