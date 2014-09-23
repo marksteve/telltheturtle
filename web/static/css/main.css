@@ -1,0 +1,51 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+}
+body {
+  text-align: center;
+}
+body, textarea, input, button {
+  font: 16px/1.5 PT Sans, sans-serif;
+}
+section {
+  max-width: 40em;
+  margin: 0 auto;
+  background: url(../img/turtle.svg) no-repeat center -48px;
+  background-size: 256px;
+  padding-top: 128px;
+}
+h1 {
+  font-family: Patrick Hand;
+  font-weight: normal;
+  text-transform: uppercase;
+  margin-top: 0;
+}
+textarea, input, button {
+  width: 100%;
+  padding: 4px 8px;
+}
+textarea:focus, input:focus, button:focus {
+  outline: none;
+}
+p {
+  margin: 0 0 1.5em 0;
+}
+textarea {
+  border: 1px solid;
+}
+input {
+  border: solid;
+  border-width: 0 0 1px 0;
+  text-align: center;
+}
+button {
+  border: 0;
+  background: transparent;
+  font-family: Patrick Hand;
+  text-transform: uppercase;
+  font-size: 200%;
+}
