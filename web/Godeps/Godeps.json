@@ -3,6 +3,14 @@
 	"GoVersion": "go1.3",
 	"Deps": [
 		{
+			"ImportPath": "github.com/dustin/randbo",
+			"Rev": "7f1b564ca7242d22bcc6e2128beb90d9fa38b9f0"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "779af66db5668074a96f522d9025cb0a5ef50d89"
+		},
+		{
 			"ImportPath": "github.com/zenazn/goji",
 			"Rev": "90d355d3e1693435a6300da7d4e191126aced78e"
 		}

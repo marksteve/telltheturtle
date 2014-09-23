@@ -8,6 +8,8 @@ import (
 
 func Serve() {
 	goji.Get("/", Index)
+	goji.Post("/", Index)
+
 	goji.Get("/static/*", http.StripPrefix(
 		"/static/",
 		http.FileServer(http.Dir("./static")),

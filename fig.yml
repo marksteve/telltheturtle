@@ -1,5 +1,11 @@
+redis:
+  image: redis
+  command: redis-server --appendonly yes
+
 web:
   build: web
+  links:
+    - redis:redis
   volumes:
     - .:/go/src/github.com/marksteve/kwentomosapagong
   ports:
