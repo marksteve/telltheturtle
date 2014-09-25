@@ -1,6 +1,9 @@
 {
-	"ImportPath": "github.com/marksteve/kwentomosapagong/web",
+	"ImportPath": "github.com/marksteve/telltheturtle",
 	"GoVersion": "go1.3",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/dustin/randbo",
@@ -9,6 +12,14 @@
 		{
 			"ImportPath": "github.com/garyburd/redigo/redis",
 			"Rev": "779af66db5668074a96f522d9025cb0a5ef50d89"
+		},
+		{
+			"ImportPath": "github.com/mailgun/mailgun-go",
+			"Rev": "3b7eda8f3bfd97aebc7f7342d12205930a218a98"
+		},
+		{
+			"ImportPath": "github.com/mbanzon/simplehttp",
+			"Rev": "6894781bc95b6a11c8b4e4a83eedb06c8a0b4536"
 		},
 		{
 			"ImportPath": "github.com/zenazn/goji",

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/garyburd/redigo/redis"
+	"github.com/marksteve/telltheturtle"
 	"github.com/zenazn/goji/web"
 )
 
@@ -39,7 +40,7 @@ func getTopic() string {
 func init() {
 	rand.Seed(time.Now().UnixNano())
 	var err error
-	t = template.Must(template.ParseGlob("templates/*.html"))
+	t = template.Must(template.ParseGlob("web/templates/*.html"))
 	rc, err = redis.Dial("tcp", "redis:6379")
 	if err != nil {
 		panic(err)
@@ -76,7 +77,7 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		storyId := Key("ttt", "story", GenID())
+		storyId := ttt.Key("story", ttt.GenID())
 
 		// Save story
 		story := []interface{}{storyId}
@@ -107,7 +108,7 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Add to story pool
-		_, err = rc.Do("SADD", Key("ttt", "stories"), storyId)
+		_, err = rc.Do("SADD", ttt.Key("stories"), storyId)
 		if err != nil {
 			msg = err.Error()
 			return
@@ -118,7 +119,7 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 		email := r.PostFormValue("email")
 		ret, err := redis.Int64(rc.Do(
 			"ZSCORE",
-			Key("ttt", "deliveries"),
+			ttt.Key("deliveries"),
 			email,
 		))
 		if err == redis.ErrNil {
@@ -129,7 +130,7 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 			)
 			_, err = rc.Do(
 				"ZADD",
-				Key("ttt", "deliveries"),
+				ttt.Key("deliveries"),
 				delivery.Unix(),
 				email,
 			)

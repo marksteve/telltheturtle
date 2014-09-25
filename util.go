@@ -1,4 +1,4 @@
-package web
+package ttt
 
 import (
 	"fmt"
@@ -13,5 +13,6 @@ func GenID() string {
 }
 
 func Key(args ...string) string {
+	args = append([]string{"ttt"}, args...)
 	return strings.Join(args, ":")
 }

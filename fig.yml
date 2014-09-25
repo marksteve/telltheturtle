@@ -3,10 +3,22 @@ redis:
   command: redis-server --appendonly yes
 
 web:
-  build: web
+  build: .
   links:
     - redis:redis
   volumes:
     - .:/go/src/github.com/marksteve/telltheturtle
   ports:
     - 8000:8000
+  command: godep go run web/cmd/ttt-web/main.go
+
+mailer:
+  build: .
+  links:
+    - redis:redis
+  volumes:
+    - .:/go/src/github.com/marksteve/telltheturtle
+  environment:
+    MAILGUN_API_KEY:
+  command: godep go run mailer/cmd/ttt-mailer/main.go
+

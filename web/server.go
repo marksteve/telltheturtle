@@ -12,7 +12,7 @@ func Serve() {
 
 	goji.Get("/static/*", http.StripPrefix(
 		"/static/",
-		http.FileServer(http.Dir("./static")),
+		http.FileServer(http.Dir("web/static")),
 	))
 	goji.Serve()
 }
