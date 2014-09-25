@@ -2,9 +2,11 @@ package web
 
 import (
 	"errors"
+	"fmt"
 	"html/template"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/garyburd/redigo/redis"
@@ -48,16 +50,22 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 	var msg string
 
 	defer func() {
-		var topic string
+		var topic, body, email string
 		if err == nil {
 			topic = getTopic()
+			body = ""
+			email = ""
 		} else {
 			topic = r.PostFormValue("topic")
+			body = r.PostFormValue("body")
+			email = r.PostFormValue("email")
 		}
 
 		t.ExecuteTemplate(w, "Index", map[string]string{
-			"Topic":   topic,
 			"Message": msg,
+			"Topic":   topic,
+			"Body":    body,
+			"Email":   email,
 		})
 	}()
 
@@ -67,18 +75,21 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		storyId := Key("kmsp", "story", GenID())
+		storyId := Key("ttt", "story", GenID())
 
 		// Save story
 		story := []interface{}{storyId}
 		for n, v := range r.PostForm {
+			_v := v[0]
 			switch n {
 			case "body":
-				if len(v[0]) < 150 {
+				_v = strings.Trim(_v, " ")
+				if len(_v) < 150 {
 					err = errors.New("Too short. At least give me a tweet long!")
 				}
 			case "email":
-				if len(v[0]) < 1 {
+				_v = strings.Trim(strings.ToLower(_v), " ")
+				if len(_v) < 1 {
 					err = errors.New("I need your email so I can send you stuff like friends do.")
 				}
 			}
@@ -86,7 +97,7 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 				msg = err.Error()
 				return
 			}
-			story = append(story, n, v[0])
+			story = append(story, n, _v)
 		}
 		_, err = rc.Do("HMSET", story...)
 		if err != nil {
@@ -95,12 +106,33 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Add to story pool
-		_, err = rc.Do("SADD", Key("kmsp", "stories"), storyId)
+		_, err = rc.Do("SADD", Key("ttt", "stories"), storyId)
 		if err != nil {
 			msg = err.Error()
 			return
 		}
-		msg = "Got it!"
+
+		// Set delivery
+		delivery := time.Now().Add(
+			time.Duration(4) * time.Hour,
+		).Add(
+			time.Duration(rand.Intn(16)) * time.Hour,
+		)
+		_, err = rc.Do(
+			"ZADD",
+			Key("ttt", "deliveries"),
+			delivery.Unix(),
+			r.PostFormValue("email"),
+		)
+		if err != nil {
+			msg = err.Error()
+			return
+		}
+
+		msg = fmt.Sprintf(
+			"Cool story bro. I'll be back in %d hours.",
+			int(delivery.Sub(time.Now()).Hours()),
+		)
 	}
 }
 
