@@ -113,20 +113,31 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Set delivery
-		delivery := time.Now().Add(
-			time.Duration(4) * time.Hour,
-		).Add(
-			time.Duration(rand.Intn(16)) * time.Hour,
-		)
-		_, err = rc.Do(
-			"ZADD",
+		var delivery time.Time
+		email := r.PostFormValue("email")
+		ret, err := redis.Int64(rc.Do(
+			"ZSCORE",
 			Key("ttt", "deliveries"),
-			delivery.Unix(),
-			r.PostFormValue("email"),
-		)
-		if err != nil {
-			msg = err.Error()
-			return
+			email,
+		))
+		if err == redis.ErrNil {
+			delivery = time.Now().Add(
+				time.Duration(4) * time.Hour,
+			).Add(
+				time.Duration(rand.Intn(16)) * time.Hour,
+			)
+			_, err = rc.Do(
+				"ZADD",
+				Key("ttt", "deliveries"),
+				delivery.Unix(),
+				email,
+			)
+			if err != nil {
+				msg = err.Error()
+				return
+			}
+		} else {
+			delivery = time.Unix(ret, 0)
 		}
 
 		msg = fmt.Sprintf(
