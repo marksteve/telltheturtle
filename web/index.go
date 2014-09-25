@@ -79,7 +79,7 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 				}
 			case "email":
 				if len(v[0]) < 1 {
-					err = errors.New("I need your email so I can send you stuff life friends do.")
+					err = errors.New("I need your email so I can send you stuff like friends do.")
 				}
 			}
 			if err != nil {
