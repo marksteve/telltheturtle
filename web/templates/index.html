@@ -19,10 +19,10 @@
     {{end}}
   </div>
   <p>
-    <textarea name="body" rows="20" placeholder="{{.Topic}}"></textarea>
+    <textarea name="body" rows="20" placeholder="{{.Topic}}">{{.Body}}</textarea>
   </p>
   <p>
-    <input name="email" type="email" placeholder="Email (e.g. pagong@gmail.com)">
+    <input name="email" type="email" placeholder="Email (e.g. pagong@gmail.com)" value="{{.Email}}">
   </p>
   <p>
     <button type="submit">Tell the turtle</button>
@@ -30,12 +30,16 @@
 </form>
 
 <pre class="about">
-You tell a story to the turtle.
-But the turtle is a gossiping bitch.
+Tell a story to the turtle.
+But beware.
+The turtle is a gossiping bitch.
 It goes around spreading it.
+But since it's a turtle,
+that takes a while.
 
-Some time later another turtle appears.
-It signals you to bend down.
+Some time later the turtle will come back.
+It'll tell you a story from another person
+who, like you, has too much time to spare.
 </pre>
 
 </section>
