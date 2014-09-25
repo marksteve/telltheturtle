@@ -37,6 +37,7 @@ func getTopic() string {
 }
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
 	var err error
 	t = template.Must(template.ParseGlob("templates/*.html"))
 	rc, err = redis.Dial("tcp", "redis:6379")
@@ -145,8 +146,4 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 			int(delivery.Sub(time.Now()).Hours()),
 		)
 	}
-}
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
 }
