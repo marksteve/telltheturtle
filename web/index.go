@@ -63,11 +63,14 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 			email = r.PostFormValue("email")
 		}
 
-		t.ExecuteTemplate(w, "Index", map[string]string{
-			"Message": msg,
-			"Topic":   topic,
-			"Body":    body,
-			"Email":   email,
+		sc, _ := redis.Int(rc.Do("SCARD", ttt.Key("stories")))
+
+		t.ExecuteTemplate(w, "Index", map[string]interface{}{
+			"Message":      msg,
+			"Topic":        topic,
+			"Body":         body,
+			"Email":        email,
+			"StoriesCount": sc,
 		})
 	}()
 
