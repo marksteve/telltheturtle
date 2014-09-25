@@ -8,15 +8,19 @@
   <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
-<section>
+<div class="page">
 
+<section class="header">
+  <h1><a href="/">Tell The Turtle</a></h1>
+  {{if .Message}}
+  <div class="message">{{.Message}}</div>
+  {{end}}
+</section>
+
+<div class="row">
+
+<section class="form">
 <form action="" method="post">
-  <div class="header">
-    <h1><a href="/">Tell The Turtle</a></h1>
-    {{if .Message}}
-    <div class="message">{{.Message}}</div>
-    {{end}}
-  </div>
   <p>
     <textarea name="body" rows="20" placeholder="{{.Topic}}">{{.Body}}</textarea>
   </p>
@@ -28,19 +32,28 @@
   </p>
   <input type="hidden" name="topic" value="{{.Topic}}">
 </form>
+</section>
 
-<pre class="about">
-Tell a story to the turtle.
-But beware.
-The turtle is a gossiping bitch.
-It goes around spreading it.
-But since it's a turtle,
-that takes a while.
+<section class="about">
+<pre>
+Legends speak of a certain turtle
+that listens to people's tales.
+Fact or fiction, it matters not -
+as long as it's not stale.
 
-Some time later the turtle will come back.
-It'll tell you a story from another person
-who, like you, has too much time to spare.
+Once you tell the turtle your story,
+he will deliver it to another lost soul.
+Somewhere out there you never know
+who will take the reader's role.
+
+Don't forget to check your mail,
+for as you give, you shall receive
+Though beware this creature's slowness
+It may still come next next eve'
 </pre>
+</section>
+
+</div>
 
 <p><small>
   An experiment by
@@ -49,7 +62,7 @@ who, like you, has too much time to spare.
   <a href="http://beatobongco.com">beatobongco</a>
 </small></p>
 
-</section>
+</div>
 </body>
 </html>
 {{end}}

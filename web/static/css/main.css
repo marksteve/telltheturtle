@@ -5,16 +5,37 @@
   -o-box-sizing: border-box;
   box-sizing: border-box;
 }
+body {
+  padding: 0;
+}
 body, textarea, input, button {
   font: 16px/1.5 PT Sans, sans-serif;
 }
-section {
-  max-width: 40rem;
+.page {
+  max-width: 70rem;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 1rem;
+  position: relative;
 }
 .header {
   position: relative;
+}
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.form, .about {
+  float: left;
+}
+.form {
+  width: 60%;
+}
+.about {
+  width: 40%;
+}
+h1 {
+  margin-top: 0;
 }
 h1 a {
   background: url(../img/turtle.svg) no-repeat left center;
@@ -55,13 +76,15 @@ button {
   border: 2px solid;
   border-radius: 10px;
   padding: 0 1rem;
-  background: transparent;
   font-family: Patrick Hand;
   text-transform: uppercase;
   font-size: 200%;
+  background: white;
 }
 .about {
+  padding: 0 3rem;
+}
+.about pre {
   font-family: inherit;
-  margin: 1.5rem 0 3rem 0;
-  color: #999;
+  margin: 0;
 }
