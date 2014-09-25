@@ -72,13 +72,17 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 		// Save story
 		story := []interface{}{storyId}
 		for n, v := range r.PostForm {
-			if len(v[0]) < 1 {
-				switch n {
-				case "body":
-					err = errors.New("Sorry, didn't catch that. You have to speak louder")
-				case "email":
-					err = errors.New("I need your email so I can send you stuff life friends do")
+			switch n {
+			case "body":
+				if len(v[0]) < 150 {
+					err = errors.New("Too short. At least give me a tweet long!")
 				}
+			case "email":
+				if len(v[0]) < 1 {
+					err = errors.New("I need your email so I can send you stuff life friends do.")
+				}
+			}
+			if err != nil {
 				msg = err.Error()
 				return
 			}
