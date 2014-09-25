@@ -14,15 +14,12 @@ body, textarea, input, button {
 section {
   max-width: 40em;
   margin: 0 auto;
-  background: url(../img/turtle.svg) no-repeat center -48px;
-  background-size: 256px;
-  padding-top: 128px;
 }
 h1 {
-  font-family: Patrick Hand;
-  font-weight: normal;
-  text-transform: uppercase;
-  margin-top: 0;
+  background: url(../img/turtle.svg) no-repeat center center;
+  text-indent: -10000em;
+  height: 100px;
+  background-size: 200px;
 }
 textarea, input, button {
   width: 100%;
@@ -35,11 +32,12 @@ p {
   margin: 0 0 1.5em 0;
 }
 textarea {
-  border: 1px solid;
+  border: 2px solid;
+  border-radius: 10px;
 }
 input {
   border: solid;
-  border-width: 0 0 1px 0;
+  border-width: 0 0 2px 0;
   text-align: center;
 }
 button {

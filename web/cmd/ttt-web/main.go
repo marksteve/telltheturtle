@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/marksteve/kwentomosapagong/web"
+	"github.com/marksteve/telltheturtle/web"
 )
 
 func main() {

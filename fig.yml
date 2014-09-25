@@ -7,6 +7,6 @@ web:
   links:
     - redis:redis
   volumes:
-    - .:/go/src/github.com/marksteve/kwentomosapagong
+    - .:/go/src/github.com/marksteve/telltheturtle
   ports:
     - 8000:8000
