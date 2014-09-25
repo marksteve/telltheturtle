@@ -1,10 +1,11 @@
 package web
 
 import (
-	"fmt"
+	"errors"
 	"html/template"
+	"math/rand"
 	"net/http"
-	"strings"
+	"time"
 
 	"github.com/garyburd/redigo/redis"
 	"github.com/zenazn/goji/web"
@@ -12,6 +13,26 @@ import (
 
 var t *template.Template
 var rc redis.Conn
+var topics = []string{
+	"A time where you truly felt alive",
+	"A moment when you thought you were going to die",
+	"A deep realization you had",
+	"Your best college/high school memory",
+	"Your first heartbreak",
+	"Your last heartbreak",
+	"Your deepest regret",
+	"Your dependence on a substance to cope with life",
+	"Your lowest point",
+	"Your highest point",
+	"How you realized your calling in life",
+	"A twisted fairy tale",
+	"A dark topic in the form of a children's story",
+	"What if a mythological hero was transported to the present?",
+}
+
+func getTopic() string {
+	return topics[rand.Intn(len(topics))]
+}
 
 func init() {
 	var err error
@@ -24,9 +45,25 @@ func init() {
 
 func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 	var err error
+	var msg string
+
+	defer func() {
+		var topic string
+		if err == nil {
+			topic = getTopic()
+		} else {
+			topic = r.PostFormValue("topic")
+		}
+
+		t.ExecuteTemplate(w, "Index", map[string]string{
+			"Topic":   topic,
+			"Message": msg,
+		})
+	}()
+
 	if r.Method == "POST" {
 		if err = r.ParseForm(); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			msg = err.Error()
 			return
 		}
 
@@ -36,27 +73,33 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 		story := []interface{}{storyId}
 		for n, v := range r.PostForm {
 			if len(v[0]) < 1 {
-				http.Error(
-					w,
-					fmt.Sprintf("%s cannot be empty", strings.Title(n)),
-					http.StatusBadRequest,
-				)
+				switch n {
+				case "body":
+					err = errors.New("Sorry, didn't catch that. You have to speak louder")
+				case "email":
+					err = errors.New("I need your email so I can send you stuff life friends do")
+				}
+				msg = err.Error()
 				return
 			}
 			story = append(story, n, v[0])
 		}
 		_, err = rc.Do("HMSET", story...)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			msg = err.Error()
 			return
 		}
 
 		// Add to story pool
 		_, err = rc.Do("SADD", Key("kmsp", "stories"), storyId)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			msg = err.Error()
 			return
 		}
+		msg = "Got it!"
 	}
-	t.ExecuteTemplate(w, "Index", nil)
+}
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
 }

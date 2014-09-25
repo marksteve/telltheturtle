@@ -8,20 +8,37 @@
   <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
-  <section>
-    <form action="" method="post">
-      <h1>Tell The Turtle</h1>
-      <p>
-        <textarea name="body" rows="20"></textarea>
-      </p>
-      <p>
-        <input name="email" type="email" placeholder="Email (e.g. pagong@gmail.com)">
-      </p>
-      <p>
-        <button type="submit">Tell the turtle</button>
-      </p>
-    </form>
-  </section>
+<section>
+
+<form action="" method="post">
+  <input type="hidden" name="topic" value="{{.Topic}}">
+  <div class="header">
+    <h1>Tell The Turtle</h1>
+    {{if .Message}}
+    <div class="message">{{.Message}}</div>
+    {{end}}
+  </div>
+  <p>
+    <textarea name="body" rows="20" placeholder="{{.Topic}}"></textarea>
+  </p>
+  <p>
+    <input name="email" type="email" placeholder="Email (e.g. pagong@gmail.com)">
+  </p>
+  <p>
+    <button type="submit">Tell the turtle</button>
+  </p>
+</form>
+
+<pre class="about">
+You tell a story to the turtle.
+But the turtle is a gossiping bitch.
+It goes around spreading it.
+
+Some time later another turtle appears.
+It signals you to bend down.
+</pre>
+
+</section>
 </body>
 </html>
 {{end}}

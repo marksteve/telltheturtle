@@ -5,45 +5,61 @@
   -o-box-sizing: border-box;
   box-sizing: border-box;
 }
-body {
-  text-align: center;
-}
 body, textarea, input, button {
   font: 16px/1.5 PT Sans, sans-serif;
 }
 section {
-  max-width: 40em;
+  max-width: 40rem;
   margin: 0 auto;
+  padding: 0 1rem;
+}
+.header {
+  position: relative;
 }
 h1 {
-  background: url(../img/turtle.svg) no-repeat center center;
+  background: url(../img/turtle.svg) no-repeat left center;
   text-indent: -10000em;
   height: 100px;
   background-size: 200px;
 }
+.message {
+  font-family: Patrick Hand;
+  position: absolute;
+  top: 10px;
+  left: 200px;
+  text-transform: uppercase;
+}
 textarea, input, button {
-  width: 100%;
   padding: 4px 8px;
 }
 textarea:focus, input:focus, button:focus {
   outline: none;
 }
 p {
-  margin: 0 0 1.5em 0;
+  margin: 0 0 1.5rem 0;
 }
 textarea {
   border: 2px solid;
   border-radius: 10px;
+  width: 100%;
 }
 input {
   border: solid;
   border-width: 0 0 2px 0;
-  text-align: center;
+  width: 50%;
 }
 button {
-  border: 0;
+  margin: 1.5rem 0;
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 0 1rem;
   background: transparent;
   font-family: Patrick Hand;
   text-transform: uppercase;
   font-size: 200%;
+}
+.about {
+  font-family: inherit;
+  margin: 1.5rem 0 3rem 0;
+  color: #999;
 }
