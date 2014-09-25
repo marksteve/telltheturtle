@@ -11,9 +11,8 @@
 <section>
 
 <form action="" method="post">
-  <input type="hidden" name="topic" value="{{.Topic}}">
   <div class="header">
-    <h1>Tell The Turtle</h1>
+    <h1><a href="/">Tell The Turtle</a></h1>
     {{if .Message}}
     <div class="message">{{.Message}}</div>
     {{end}}
@@ -27,6 +26,7 @@
   <p>
     <button type="submit">Tell the turtle</button>
   </p>
+  <input type="hidden" name="topic" value="{{.Topic}}">
 </form>
 
 <pre class="about">
@@ -41,6 +41,13 @@ Some time later the turtle will come back.
 It'll tell you a story from another person
 who, like you, has too much time to spare.
 </pre>
+
+<p><small>
+  An experiment by
+  <a href="http://marksteve.com">marksteve</a>
+  and
+  <a href="http://beatobongco.com">beatobongco</a>
+</small></p>
 
 </section>
 </body>

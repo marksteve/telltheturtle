@@ -16,11 +16,13 @@ section {
 .header {
   position: relative;
 }
-h1 {
+h1 a {
   background: url(../img/turtle.svg) no-repeat left center;
   text-indent: -10000em;
   height: 100px;
   background-size: 200px;
+  text-decoration: none;
+  display: block;
 }
 .message {
   font-family: Patrick Hand;
