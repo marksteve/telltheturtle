@@ -127,9 +127,9 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 		))
 		if err == redis.ErrNil {
 			delivery = time.Now().Add(
-				time.Duration(4) * time.Second,
+				time.Duration(4) * time.Hour,
 			).Add(
-				time.Duration(rand.Intn(16)) * time.Second,
+				time.Duration(rand.Intn(16)) * time.Hour,
 			)
 			_, err = rc.Do(
 				"ZADD",
