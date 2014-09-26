@@ -44,10 +44,58 @@ func getPendingDeliveries(
 		now.Unix(),
 	))
 	for _, email := range emails {
-		sh, _ := redis.String(rc.Do(
-			"SRANDMEMBER",
-			ttt.Key("stories"),
-		))
+		var err error
+		sh := ""
+		for t := 5; t > 0; t-- {
+			// Some delay to avoid choking redis
+			time.Sleep(100 * time.Millisecond)
+
+			// Get random story hash
+			log.Printf("Getting a random story for %v", email)
+			sh, err = redis.String(rc.Do(
+				"SRANDMEMBER",
+				ttt.Key("stories"),
+			))
+			if err != nil {
+				log.Printf("  Error: %v", err)
+				continue
+			}
+
+			// Get story details
+			var story Story
+			err = getStory(sh, &story)
+			if err != nil {
+				log.Printf("  Error: %v", err)
+				continue
+			}
+			log.Printf("  Got %v", sh)
+
+			// Check if story is from the same person
+			if email == story.Email {
+				log.Printf("  It's the same person!")
+				continue
+			}
+
+			// Check if story has already been delivered
+			_, err := redis.Int64(rc.Do(
+				"ZSCORE",
+				ttt.Key("delivered", email),
+				sh,
+			))
+			if err != redis.ErrNil {
+				log.Printf("  But it was already delivered to %v", email)
+				continue
+			}
+
+			break
+		}
+
+		// Try again next batch
+		if sh == "" {
+			log.Printf("  Skipping %v", email)
+			continue
+		}
+
 		delivery := Delivery{
 			Recipient: email,
 			StoryHash: sh,
@@ -63,18 +111,29 @@ func getPendingDeliveries(
 type Story struct {
 	Topic string `redis:"topic"`
 	Body  string `redis:"body"`
+	Email string `redis:"email"`
+}
+
+func getStory(sh string, story *Story) error {
+	v, err := redis.Values(rc.Do("HGETALL", sh))
+	redis.ScanStruct(v, story)
+	return err
 }
 
 func sendDeliveries(
 	done <-chan os.Signal,
 	deliveries chan Delivery,
 ) {
+	var err error
 	for {
 		select {
 		case delivery := <-deliveries:
-			v, _ := redis.Values(rc.Do("HGETALL", delivery.StoryHash))
 			var story Story
-			redis.ScanStruct(v, &story)
+			err = getStory(delivery.StoryHash, &story)
+			if err != nil {
+				log.Printf("Error getting story details: %v", err)
+				continue
+			}
 			m := mg.NewMessage(
 				"Turtle <turtle@telltheturtle.com>",
 				"The turtle has a story for you",
@@ -90,6 +149,12 @@ Topic: %s
 				"ZREM",
 				ttt.Key("deliveries"),
 				delivery.Recipient,
+			)
+			rc.Do(
+				"ZADD",
+				ttt.Key("delivered", delivery.Recipient),
+				time.Now().Unix(),
+				delivery.StoryHash,
 			)
 			log.Printf("Sent: %v", delivery)
 		case <-done:
