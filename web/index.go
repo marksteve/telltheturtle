@@ -15,7 +15,7 @@ import (
 )
 
 var t *template.Template
-var rc redis.Conn
+var rp *redis.Pool
 var topics = []string{
 	"A time where you truly felt alive",
 	"A moment when you thought you were going to die",
@@ -39,17 +39,14 @@ func getTopic() string {
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	var err error
 	t = template.Must(template.ParseGlob("web/templates/*.html"))
-	rc, err = redis.Dial("tcp", "redis:6379")
-	if err != nil {
-		panic(err)
-	}
+	rp = ttt.NewRedisPool()
 }
 
 func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 	var err error
 	var msg string
+	rc := rp.Get()
 
 	defer func() {
 		var topic, body, email string
@@ -72,6 +69,8 @@ func Index(c web.C, w http.ResponseWriter, r *http.Request) {
 			"Email":        email,
 			"StoriesCount": sc,
 		})
+
+		rc.Close()
 	}()
 
 	if r.Method == "POST" {

@@ -11,15 +11,11 @@ import (
 	"github.com/marksteve/telltheturtle"
 )
 
-var rc redis.Conn
+var rp *redis.Pool
 var mg mailgun.Mailgun
 
 func init() {
-	var err error
-	rc, err = redis.Dial("tcp", "redis:6379")
-	if err != nil {
-		panic(err)
-	}
+	rp = ttt.NewRedisPool()
 	mg = mailgun.NewMailgun(
 		"telltheturtle.com",
 		os.Getenv("MAILGUN_API_KEY"),
@@ -32,10 +28,18 @@ type Delivery struct {
 	StoryHash string
 }
 
+type Story struct {
+	Topic string `redis:"topic"`
+	Body  string `redis:"body"`
+	Email string `redis:"email"`
+}
+
 func getPendingDeliveries(
 	done <-chan os.Signal,
 	deliveries chan Delivery,
 ) {
+	rc := rp.Get()
+	defer rc.Close()
 	now := time.Now().Round(time.Minute)
 	emails, _ := redis.Strings(rc.Do(
 		"ZRANGEBYSCORE",
@@ -45,8 +49,9 @@ func getPendingDeliveries(
 	))
 	for _, email := range emails {
 		var err error
-		sh := ""
-		for t := 5; t > 0; t-- {
+		var sh string
+
+		for t := 10; t > 0; t-- {
 			// Some delay to avoid choking redis
 			time.Sleep(100 * time.Millisecond)
 
@@ -58,14 +63,17 @@ func getPendingDeliveries(
 			))
 			if err != nil {
 				log.Printf("  Error: %v", err)
+				sh = ""
 				continue
 			}
 
 			// Get story details
 			var story Story
-			err = getStory(sh, &story)
+			v, err := redis.Values(rc.Do("HGETALL", sh))
+			redis.ScanStruct(v, &story)
 			if err != nil {
 				log.Printf("  Error: %v", err)
+				sh = ""
 				continue
 			}
 			log.Printf("  Got %v", sh)
@@ -73,17 +81,19 @@ func getPendingDeliveries(
 			// Check if story is from the same person
 			if email == story.Email {
 				log.Printf("  It's the same person!")
+				sh = ""
 				continue
 			}
 
 			// Check if story has already been delivered
-			_, err := redis.Int64(rc.Do(
+			_, err = redis.Int64(rc.Do(
 				"ZSCORE",
 				ttt.Key("delivered", email),
 				sh,
 			))
 			if err != redis.ErrNil {
 				log.Printf("  But it was already delivered to %v", email)
+				sh = ""
 				continue
 			}
 
@@ -92,32 +102,59 @@ func getPendingDeliveries(
 
 		// Try again next batch
 		if sh == "" {
-			log.Printf("  Skipping %v", email)
+			log.Printf("Skipping %v", email)
 			continue
 		}
 
-		delivery := Delivery{
+		d := Delivery{
 			Recipient: email,
 			StoryHash: sh,
 		}
 		select {
-		case deliveries <- delivery:
+		case deliveries <- d:
 		case <-done:
 			return
 		}
 	}
 }
 
-type Story struct {
-	Topic string `redis:"topic"`
-	Body  string `redis:"body"`
-	Email string `redis:"email"`
-}
+func sendStory(d Delivery) error {
+	rc := rp.Get()
+	defer rc.Close()
+	var story Story
+	v, err := redis.Values(rc.Do("HGETALL", d.StoryHash))
+	redis.ScanStruct(v, &story)
+	if err != nil {
+		log.Printf("Error getting story details: %v", err)
+		return err
+	}
+	m := mg.NewMessage(
+		"Turtle <turtle@telltheturtle.com>",
+		"The turtle has a story for you",
+		fmt.Sprintf(`
+Topic: %s
 
-func getStory(sh string, story *Story) error {
-	v, err := redis.Values(rc.Do("HGETALL", sh))
-	redis.ScanStruct(v, story)
-	return err
+%s
+
+Tell the turtle
+http://telltheturtle.com
+`, story.Topic, story.Body),
+		d.Recipient,
+	)
+	mg.Send(m)
+	rc.Do(
+		"ZREM",
+		ttt.Key("deliveries"),
+		d.Recipient,
+	)
+	rc.Do(
+		"ZADD",
+		ttt.Key("delivered", d.Recipient),
+		time.Now().Unix(),
+		d.StoryHash,
+	)
+	log.Printf("Sent: %v", d)
+	return nil
 }
 
 func sendDeliveries(
@@ -127,39 +164,11 @@ func sendDeliveries(
 	var err error
 	for {
 		select {
-		case delivery := <-deliveries:
-			var story Story
-			err = getStory(delivery.StoryHash, &story)
+		case d := <-deliveries:
+			err = sendStory(d)
 			if err != nil {
-				log.Printf("Error getting story details: %v", err)
 				continue
 			}
-			m := mg.NewMessage(
-				"Turtle <turtle@telltheturtle.com>",
-				"The turtle has a story for you",
-				fmt.Sprintf(`
-Topic: %s
-
-%s
-
-Tell the turtle
-http://telltheturtle.com
-`, story.Topic, story.Body),
-				delivery.Recipient,
-			)
-			mg.Send(m)
-			rc.Do(
-				"ZREM",
-				ttt.Key("deliveries"),
-				delivery.Recipient,
-			)
-			rc.Do(
-				"ZADD",
-				ttt.Key("delivered", delivery.Recipient),
-				time.Now().Unix(),
-				delivery.StoryHash,
-			)
-			log.Printf("Sent: %v", delivery)
 		case <-done:
 			return
 		}
@@ -176,7 +185,7 @@ func Run(done chan os.Signal) {
 		case <-done:
 			log.Println("Bye.")
 			return
-		case <-time.After(time.Minute):
+		case <-time.After(10 * time.Second):
 		}
 	}
 }
