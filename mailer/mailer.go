@@ -141,6 +141,9 @@ func sendDeliveries(
 Topic: %s
 
 %s
+
+Tell the turtle
+http://telltheturtle.com
 `, story.Topic, story.Body),
 				delivery.Recipient,
 			)
