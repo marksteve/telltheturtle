@@ -25,6 +25,7 @@ func Admin(c web.C, w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		redis.ScanStruct(v, &story)
+		story.Hash = sh
 		stories = append(stories, story)
 	}
 
@@ -43,4 +44,12 @@ func Admin(c web.C, w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "POST" {
 	}
+}
+
+func RemoveStory(c web.C, w http.ResponseWriter, r *http.Request) {
+	rc := rp.Get()
+	sh := c.URLParams["sh"]
+	rc.Do("SREM", ttt.Key("stories"), sh)
+	rc.Do("SADD", ttt.Key("removed_stories"), sh)
+	http.Redirect(w, r, "/supersecret", http.StatusTemporaryRedirect)
 }

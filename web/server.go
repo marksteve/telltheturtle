@@ -27,6 +27,8 @@ func Serve() {
 	goji.Get("/supersecret", Admin)
 	goji.Post("/supersecret", Admin)
 
+	goji.Get("/remove_story/:sh", RemoveStory)
+
 	goji.Get("/static/*", http.StripPrefix(
 		"/static/",
 		http.FileServer(http.Dir("web/static")),
