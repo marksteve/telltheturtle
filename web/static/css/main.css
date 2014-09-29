@@ -88,6 +88,15 @@ button {
   font-family: inherit;
   margin: 0;
 }
-.stories {
+.stories-count {
   color: #ddd;
+}
+.stories {
+  list-style: none;
+  padding: 0;
+}
+.stories li {
+  padding: 1em;
+  border: 1px #ddd solid;
+  margin-bottom: 1.5em;
 }

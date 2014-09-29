@@ -24,8 +24,8 @@ func Serve() {
 	goji.Get("/", Index)
 	goji.Post("/", Index)
 
-	goji.Get("/admin", Admin)
-	goji.Post("/admin", Admin)
+	goji.Get("/supersecret", Admin)
+	goji.Post("/supersecret", Admin)
 
 	goji.Get("/static/*", http.StripPrefix(
 		"/static/",

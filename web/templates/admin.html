@@ -18,6 +18,21 @@
   {{end}}
 </section>
 
+<section class="admin">
+<h2>Admin</h2>
+<ul class="stories">
+{{range .Stories}}
+  <li>
+    <p>
+      Email: {{.Email}}<br>
+      Topic: {{.Topic}}
+    </p>
+    <p>{{.Body}}</p>
+  </li>
+{{end}}
+</ul>
+</section>
+
 </div>
 </body>
 </html>

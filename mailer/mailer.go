@@ -28,12 +28,6 @@ type Delivery struct {
 	StoryHash string
 }
 
-type Story struct {
-	Topic string `redis:"topic"`
-	Body  string `redis:"body"`
-	Email string `redis:"email"`
-}
-
 func getPendingDeliveries(
 	done <-chan os.Signal,
 	deliveries chan Delivery,
@@ -68,7 +62,7 @@ func getPendingDeliveries(
 			}
 
 			// Get story details
-			var story Story
+			var story ttt.Story
 			v, err := redis.Values(rc.Do("HGETALL", sh))
 			redis.ScanStruct(v, &story)
 			if err != nil {
@@ -121,7 +115,7 @@ func getPendingDeliveries(
 func sendStory(d Delivery) error {
 	rc := rp.Get()
 	defer rc.Close()
-	var story Story
+	var story ttt.Story
 	v, err := redis.Values(rc.Do("HGETALL", d.StoryHash))
 	redis.ScanStruct(v, &story)
 	if err != nil {
