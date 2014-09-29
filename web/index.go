@@ -3,7 +3,6 @@ package web
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"math/rand"
 	"net/http"
 	"strings"
@@ -14,8 +13,6 @@ import (
 	"github.com/zenazn/goji/web"
 )
 
-var t *template.Template
-var rp *redis.Pool
 var topics = []string{
 	"A time where you truly felt alive",
 	"A moment when you thought you were going to die",
@@ -35,12 +32,6 @@ var topics = []string{
 
 func getTopic() string {
 	return topics[rand.Intn(len(topics))]
-}
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-	t = template.Must(template.ParseGlob("web/templates/*.html"))
-	rp = ttt.NewRedisPool()
 }
 
 func Index(c web.C, w http.ResponseWriter, r *http.Request) {

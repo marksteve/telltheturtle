@@ -1,0 +1,24 @@
+{{define "Admin"}}
+<!doctype html>
+<html>
+<head>
+  <title>Tell the Turtle</title>
+  <link rel="shortcut icon" href="/static/img/favicon.ico">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Patrick+Hand|PT+Sans">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.1/normalize.min.css">
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<div class="page">
+
+<section class="header">
+  <h1><a href="/">Tell the Turtle</a></h1>
+  {{if .Message}}
+  <div class="message">{{.Message}}</div>
+  {{end}}
+</section>
+
+</div>
+</body>
+</html>
+{{end}}
